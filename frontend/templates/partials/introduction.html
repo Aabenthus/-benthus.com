@@ -1,0 +1,18 @@
+<div
+	class="background"
+	back-img="{{ background.src }}"
+	ng-repeat="background in backgrounds"
+	ng-show="selected_background==$index">
+</div>
+
+<div class="logos-container">
+	<div class="logos">
+		<div
+			class="company"
+			ng-repeat="company in companies">
+			<a ng-href="{{ company.link }}">
+				<img ng-src="{{ company.logo_src }}">
+			</a>
+		</div>
+	</div>
+</div>
