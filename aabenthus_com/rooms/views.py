@@ -126,11 +126,6 @@ def list_bookings(request, timeMin = None, timeMax = None):
 	return HttpResponse( json.dumps(future_events),
 		content_type="application/json" )
 
-def list_rooms(request):
-	rooms = Room.objects.all()
-	return HttpResponse( json.dumps( [ room.as_dict() for room in rooms ] ),
-		content_type="application/json" )
-
 def notify_about_conflicts(request):
 	authrization = get_authrization()
 	service = services.calendar(authrization)

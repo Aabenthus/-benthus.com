@@ -8,8 +8,3 @@ class Authorization(models.Model):
 	
 	def __str__(self):
 		return 'Authorization %s' % ( self.email )
-
-	def refresh_if_needed(self):
-		credentials = json.loads(self.credentials)
-		print(credentials.get('refresh_token'))
-		pass

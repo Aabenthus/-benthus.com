@@ -5,7 +5,6 @@ urlpatterns = patterns('',
     # url(r'^$', 'aabenthus_com.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
-    url(r'^$', 'aabenthus_com.rooms.views.list_rooms', name='list_rooms'),
     url(r'^bookings/?$', 'aabenthus_com.rooms.views.list_bookings', name='list_bookings'),
     url(r'^bookings/(?P<timeMin>[\d\-T:Z.]+)/(?P<timeMax>[\d\-T:Z.]+)/?$',
     	'aabenthus_com.rooms.views.list_bookings', name='list_bookings_limited'),
