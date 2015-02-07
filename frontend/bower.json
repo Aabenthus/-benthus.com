@@ -1,0 +1,24 @@
+{
+  "name": "aabenthus_com",
+  "version": "0.0.1",
+  "homepage": "https://github.com/Aabenthus/-benthus.com",
+  "authors": [
+    "Kræn Hansen (Socialsquare) <kraen@socialsquare.dk>"
+  ],
+  "description": "The frontend for åbenthus.com",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "fullcalendar": "~2.2.6",
+    "angular": "~1.3.12",
+    "bootstrap": "~3.3.2",
+    "angular-ui-router": "~0.2.13",
+    "jquery": "~2.1.3"
+  }
+}

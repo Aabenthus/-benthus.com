@@ -1,0 +1,5 @@
+*.sqlite3
+*.pyc
+aabenthus_com/local_settings.py
+**/bower_components/*
+**/node_modules/*
