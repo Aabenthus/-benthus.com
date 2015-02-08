@@ -10,6 +10,7 @@ import dateutil.parser
 import json
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.django_orm import Storage
 import re
 
 from aabenthus_com.google import services
@@ -17,9 +18,9 @@ from aabenthus_com.google.models import Authorization
 
 from .models import Room
 
-def get_authrization():
-	authorization = Authorization.objects.filter(email=settings.ROOMS_EMAIL).last()
-	return authorization
+def get_credentials():
+	storage = Storage(Authorization, 'email', settings.ROOMS_EMAIL, 'credentials')
+	return storage.get()
 
 def split_events_on_rooms(events):
 	result = list()
@@ -75,8 +76,8 @@ Please update your event by choosing a different location or time.''' % text_dat
 	msg.send()
 
 def decline_conflicting_event(event, room):
-	authrization = get_authrization()
-	service = services.calendar(authrization)
+	credentials = get_credentials()
+	service = services.calendar(credentials)
 
 	for attendee in event.get('attendees'):
 		if attendee['self']:
@@ -97,8 +98,8 @@ def has_declined_event(event):
 	return False
 
 def list_bookings(request, timeMin = None, timeMax = None):
-	authrization = get_authrization()
-	service = services.calendar(authrization)
+	credentials = get_credentials()
+	service = services.calendar(credentials)
 
 	if timeMin:
 		timeMin = dateutil.parser.parse(timeMin)
@@ -127,8 +128,8 @@ def list_bookings(request, timeMin = None, timeMax = None):
 		content_type="application/json" )
 
 def notify_about_conflicts(request):
-	authrization = get_authrization()
-	service = services.calendar(authrization)
+	credentials = get_credentials()
+	service = services.calendar(credentials)
 
 	timeMin = timezone.now()
 	timeMin = timeMin.replace(hour = 0, minute = 0, second = 0, microsecond = 0)

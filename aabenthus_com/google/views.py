@@ -5,6 +5,7 @@ from django.core.urlresolvers import reverse
 
 import json
 from oauth2client.client import OAuth2WebServerFlow
+from oauth2client.django_orm import Storage
 from aabenthus_com.google import services
 
 from .models import Authorization
@@ -29,16 +30,13 @@ def oauth2callback(request):
                              access_type='offline' )
 	code = request.GET['code']
 	credentials = flow.step2_exchange(code)
-
-	authorization = Authorization()
-	authorization.credentials = credentials.to_json()
 	
-	oauth2 = services.oauth2(authorization)
+	oauth2 = services.oauth2(credentials)
 	userinfo_request = oauth2.userinfo().get()
 	userinfo = userinfo_request.execute()
 
-	authorization.email = userinfo.get('email')
-	authorization.save()
+	storage = Storage(Authorization, 'email', userinfo.get('email'), 'credentials')
+	storage.put(credentials)
 
 	response = {'status': 'ok'}
 	return HttpResponse( json.dumps(response),
