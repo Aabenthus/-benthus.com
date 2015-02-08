@@ -1,0 +1,9 @@
+Hi {{ event.organizer.displayName }},
+
+You have invited {{ rooms_email }} for an event in {{ room.title }} at {{ event.start.dateTime }} titled "{{ event.summary }}", but {{ event.conflicts_with.organizer.displayName }} beat you too it.
+
+Please update your event by choosing a different location or time. Visit {{ frontend_calendar_link }} to get an overview of all reservations.
+
+---
+
+Have a great day - your fellow co-workers @ Åbenthus!
