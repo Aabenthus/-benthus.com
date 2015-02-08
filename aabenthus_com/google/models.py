@@ -8,4 +8,8 @@ class Authorization(models.Model):
 	credentials = CredentialsField()
 	
 	def __str__(self):
-		return 'Authorization %s' % ( self.email )
+		return 'Authorization %s (%s %s)' % (
+			self.email,
+			'invalid' if self.credentials.invalid else 'valid',
+			'with refresh token' if self.credentials.refresh_token else 'without refresh token'
+		)
