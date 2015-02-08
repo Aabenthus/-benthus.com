@@ -1,12 +1,16 @@
+# -*- coding: utf-8 -*-
 from django.shortcuts import render
 from django.http import HttpResponse
 from django.conf import settings
 from django.forms.models import model_to_dict
 from django.core.mail import EmailMultiAlternatives
-
 from django.utils import timezone
+from django.template.loader import render_to_string
+
 from datetime import timedelta
 import dateutil.parser
+import pytz
+
 import json
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
@@ -17,6 +21,9 @@ from aabenthus_com.google import services
 from aabenthus_com.google.models import Authorization
 
 from .models import Room
+
+# Used to create iCal feeds for each of the rooms.
+from icalendar import Calendar, Event, vCalAddress
 
 def get_credentials():
 	storage = Storage(Authorization, 'email', settings.ROOMS_EMAIL, 'credentials')
@@ -49,8 +56,8 @@ def calculate_conflicts(rooms):
 				event1_ends_efter_event2_starts = event1.get('end') > event2.get('start')
 				event1_starts_before_event2_ends = event1.get('starts') < event2.get('end')
 				if different and event1_ends_efter_event2_starts and event1_starts_before_event2_ends:
-					event1_created = dateutil.parser.parse( event1.get('created') )
-					event2_created = dateutil.parser.parse( event2.get('created') )
+					event1_created = dateutil.parser.parse( event1.get('updated') )
+					event2_created = dateutil.parser.parse( event2.get('updated') )
 					if event1_created > event2_created:
 						event1['conflicts'] = True
 						event1['conflicts_with'] = event2
@@ -61,27 +68,35 @@ def calculate_conflicts(rooms):
 
 def send_conflict_mail(event, room):
 	organizers_email = event.get('organizer').get('email')
-	text_data = (
-		settings.ROOMS_EMAIL,
-		room.get('title'),
-		event.get('conflicts_with').get('organizer').get('displayName')
-	)
-	text_content = '''You have invited %s for an event in %s, but %s beat you too it.\n
-Please update your event by choosing a different location or time.''' % text_data
-	# html_content = '<p>This is an <strong>important</strong> message.</p>'
+
+	template_data = {
+		'event': event,
+		'room': room,
+		'rooms_email': settings.ROOMS_EMAIL,
+		'frontend_calendar_link': settings.FRONTEND_BASE_URL + '/#/rooms'
+	}
+
+	text_content = render_to_string('email-conflicting-event.txt', template_data)
+	html_content = render_to_string('email-conflicting-event.html', template_data)
 
 	msg = EmailMultiAlternatives(settings.CONFLICT_MAIL_SUBJECT % event.get('summary'),
 		text_content, settings.CONFLICT_MAIL_FROM, [organizers_email])
-	#msg.attach_alternative(html_content, "text/html")
+	msg.attach_alternative(html_content, "text/html")
 	msg.send()
 
-def decline_conflicting_event(event, room):
+def change_response_status(event, status):
 	credentials = get_credentials()
 	service = services.calendar(credentials)
 
-	for attendee in event.get('attendees'):
-		if attendee['self']:
-			attendee['responseStatus'] = 'declined'
+	if event.get('attendees'):
+		for attendee in event.get('attendees'):
+			if attendee['self']:
+				attendee['responseStatus'] = status
+	else: # Althrough this is very unlikely ..
+		event['attendees'] = [{
+			'email': settings.ROOMS_EMAIL,
+			'responseStatus': status
+		}]
 
 	service.events().update(
 		calendarId='primary',
@@ -127,7 +142,7 @@ def list_bookings(request, timeMin = None, timeMax = None):
 	return HttpResponse( json.dumps(future_events),
 		content_type="application/json" )
 
-def notify_about_conflicts(request):
+def get_future_events():
 	credentials = get_credentials()
 	service = services.calendar(credentials)
 
@@ -145,17 +160,84 @@ def notify_about_conflicts(request):
 		orderBy='startTime'
 	)
 	all_future_events = all_future_events_request.execute()
-	future_events = split_events_on_rooms(all_future_events.get('items'))
+
+	return ( all_future_events.get('items'), all_future_events.get('timeZone') )
+
+def notify_about_conflicts(request):
+	all_future_events, timeZone = get_future_events()
+	future_events = split_events_on_rooms(all_future_events)
 	future_events = calculate_conflicts(future_events)
 	declined_events = list()
+	accepted_events = list()
 
+	# Let's first accept all events which needs acceptance.
+	# We need to do this before declining to keep the order in which the events
+	# have been updated.
+	for room in future_events:
+		for event in room.get('events'):
+			declines_event = has_declined_event(event)
+			if not event.get('conflicts') and declines_event:
+				change_response_status(event, 'accepted')
+				accepted_events.append(event)
+
+	# Then let's decline events which needs to be declined.
 	for room in future_events:
 		for event in room.get('events'):
 			declines_event = has_declined_event(event)
 			if event.get('conflicts') and not declines_event:
 				send_conflict_mail(event, room)
-				decline_conflicting_event(event, room)
+				change_response_status(event, 'declined')
 				declined_events.append(event)
 
-	return HttpResponse( json.dumps( {'declined_events': declined_events} ),
-		content_type="application/json" )
+	return HttpResponse( json.dumps( {
+		'declined_events': declined_events,
+		'accepted_events': accepted_events
+	} ), content_type="application/json" )
+
+def booking_ical_feed(request, room_slug):
+	room = Room.objects.filter(title__iexact = room_slug).first()
+	if room:
+		# Create a calendar
+		cal = Calendar()
+		cal['summary'] = u'☑ %s room' % room.title
+
+		all_future_events, timeZone = get_future_events()
+		timeZone = pytz.timezone(timeZone)
+		future_events = split_events_on_rooms(all_future_events)
+		future_events = calculate_conflicts(future_events)
+
+		for some_room in future_events:
+			if some_room.get('title') == room.title:
+				for event in some_room.get('events'):
+					if not event.get('conflicts'):
+						ical_event = Event()
+
+						ical_event.add('id', event.get('iCalUID'))
+
+						start = dateutil.parser.parse( event.get('start').get('dateTime') )
+						end = dateutil.parser.parse( event.get('end').get('dateTime') )
+						start = start.replace(tzinfo=timeZone)
+						end = end.replace(tzinfo=timeZone)
+						ical_event.add('dtstart', start)
+						ical_event.add('dtend', end)
+							
+						ical_organizer = vCalAddress( 'MAILTO:%s' % event.get('organizer').get('email') )
+						ical_organizer.params['cn'] = event.get('organizer').get('displayName')
+						ical_event.add('organizer', ical_organizer)
+
+						if event.get('visibility') == 'private':
+							ical_event.add('summary', 'Booked')
+						else:
+							ical_event.add('summary', event.get('summary'))
+							ical_event.add('location', event.get('location'))
+							for attendee in event.get('attendees'):
+								ical_attendee = vCalAddress('MAILTO:%s' % attendee.get('email'))
+								ical_attendee.params['cn'] = attendee.get('displayName')
+								ical_event.add('attendee', ical_attendee)
+
+						cal.add_component(ical_event)
+
+		return HttpResponse( cal.to_ical() )#, content_type="text/calendar" )
+	else:
+		slugs = ', '.join([room.title.lower() for room in Room.objects.all()])
+		return HttpResponse('Please choose one of the following room slugs: %s' % slugs)
