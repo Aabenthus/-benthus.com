@@ -6,6 +6,7 @@ from django.forms.models import model_to_dict
 from django.core.mail import EmailMultiAlternatives
 from django.utils import timezone
 from django.template.loader import render_to_string
+from django.core.urlresolvers import reverse
 
 from datetime import timedelta
 import dateutil.parser
@@ -66,6 +67,10 @@ def calculate_conflicts(rooms):
 						event2['conflicts_with'] = event1
 	return rooms
 
+def add_organizers_images(rooms_and_events):
+	#organizer_image
+	return rooms_and_events
+
 def send_conflict_mail(event, room):
 	organizers_email = event.get('organizer').get('email')
 
@@ -112,6 +117,41 @@ def has_declined_event(event):
 					return True
 	return False
 
+def get_future_events():
+	credentials = get_credentials()
+	service = services.calendar(credentials)
+
+	timeMin = timezone.now()
+	timeMin = timeMin.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+
+	one_month = timedelta(days=30) # We look one month forward
+	timeMax = timeMin + one_month
+
+	all_future_events_request = service.events().list(
+		calendarId = 'primary',
+		singleEvents=True,
+		timeMin=timeMin.isoformat(),
+		timeMax=timeMax.isoformat(),
+		orderBy='startTime'
+	)
+	all_future_events = all_future_events_request.execute()
+
+	return ( all_future_events.get('items'), all_future_events.get('timeZone') )
+
+# Accessable views
+
+def list_rooms(request):
+	rooms = list()
+	for room in Room.objects.all():
+		room_dict = room.as_dict()
+		room_dict['url'] = reverse('booking_ical_feed', kwargs={ 'room_slug': room.slug() })
+		room_dict['url'] = request.build_absolute_uri(room_dict['url'])
+		rooms.append( room_dict )
+	return HttpResponse( json.dumps({
+		'rooms': rooms,
+		'email': settings.ROOMS_EMAIL
+	}), content_type="application/json" )
+
 def list_bookings(request, timeMin = None, timeMax = None):
 	credentials = get_credentials()
 	service = services.calendar(credentials)
@@ -138,30 +178,10 @@ def list_bookings(request, timeMin = None, timeMax = None):
 	all_future_events = all_future_events_request.execute()
 	future_events = split_events_on_rooms(all_future_events.get('items'))
 	future_events = calculate_conflicts(future_events)
+	future_events = add_organizers_images(future_events)
 
 	return HttpResponse( json.dumps(future_events),
 		content_type="application/json" )
-
-def get_future_events():
-	credentials = get_credentials()
-	service = services.calendar(credentials)
-
-	timeMin = timezone.now()
-	timeMin = timeMin.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-
-	one_month = timedelta(days=30) # We look one month forward
-	timeMax = timeMin + one_month
-
-	all_future_events_request = service.events().list(
-		calendarId = 'primary',
-		singleEvents=True,
-		timeMin=timeMin.isoformat(),
-		timeMax=timeMax.isoformat(),
-		orderBy='startTime'
-	)
-	all_future_events = all_future_events_request.execute()
-
-	return ( all_future_events.get('items'), all_future_events.get('timeZone') )
 
 def notify_about_conflicts(request):
 	all_future_events, timeZone = get_future_events()
@@ -195,8 +215,9 @@ def notify_about_conflicts(request):
 	} ), content_type="application/json" )
 
 def booking_ical_feed(request, room_slug):
-	room = Room.objects.filter(title__iexact = room_slug).first()
-	if room:
+	rooms = [r for r in Room.objects.all() if r.slug() == room_slug]
+	if len(rooms) == 1:
+		room = rooms[0]
 		# Create a calendar
 		cal = Calendar()
 		cal['summary'] = u'☑ %s room' % room.title
@@ -230,14 +251,15 @@ def booking_ical_feed(request, room_slug):
 						else:
 							ical_event.add('summary', event.get('summary'))
 							ical_event.add('location', event.get('location'))
-							for attendee in event.get('attendees'):
-								ical_attendee = vCalAddress('MAILTO:%s' % attendee.get('email'))
-								ical_attendee.params['cn'] = attendee.get('displayName')
-								ical_event.add('attendee', ical_attendee)
+							if event.get('attendees'):
+								for attendee in event.get('attendees'):
+									ical_attendee = vCalAddress('MAILTO:%s' % attendee.get('email'))
+									ical_attendee.params['cn'] = attendee.get('displayName')
+									ical_event.add('attendee', ical_attendee)
 
 						cal.add_component(ical_event)
 
-		return HttpResponse( cal.to_ical() )#, content_type="text/calendar" )
+		return HttpResponse( cal.to_ical(), content_type="text/calendar" )
 	else:
-		slugs = ', '.join([room.title.lower() for room in Room.objects.all()])
+		slugs = ', '.join([room.slug() for room in Room.objects.all()])
 		return HttpResponse('Please choose one of the following room slugs: %s' % slugs)
