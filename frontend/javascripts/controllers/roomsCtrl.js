@@ -1,9 +1,15 @@
 var module = angular.module('aabenthus');
 
-module.controller('roomsCtrl', ['rooms', '$scope', function(rooms, $scope) {
+module.controller('roomsCtrl', ['rooms', '$scope', 'rooms_information',
+	function(rooms, $scope, rooms_information) {
+
 	$scope.loading = false;
+	$scope.information_visible = false;
+	$scope.rooms_information = rooms_information;
 
 	var PADDING = 10;
+	var REFRESH_RATE = 30*1000; // Every 30 seconds.
+	
 	$('#calendar').fullCalendar({
 		// put your options and callbacks here
 		firstDay: 1,
@@ -12,6 +18,13 @@ module.controller('roomsCtrl', ['rooms', '$scope', function(rooms, $scope) {
 		timeFormat: 'H:mm',
 		axisFormat: 'H(:mm)',
 		minTime: '8:00:00',
+		slotEventOverlap: false,
+		businessHours: {
+			start: '9:00',
+			end: '17:00',
+			dow: [ 1, 2, 3, 4, 5 ]
+		},
+		hiddenDays: [ 6, 0 ],
 		events: function(start, end, timezone, callback) {
 			var events = [];
 			rooms.get_bookings(start, end).then(function(rooms) {
@@ -43,16 +56,16 @@ module.controller('roomsCtrl', ['rooms', '$scope', function(rooms, $scope) {
 		eventRender: function(event, element) {
 			if(event.glyphicon) {
 				$(element).append('<span class="glyphicon glyphicon-'+event.glyphicon+'">');
+				if(event.organizer_image) {
+					$organizer = $('<span class="organizer"></span>');
+					$organizer.css('background-image', 'url(' +event.organizer_photo+ ')');
+					$(element).append($organizer);
+				}
 			}
 		},
 		loading: function(isLoading, view) {
 			console.log(isLoading);
 			$scope.loading = isLoading;
-		},
-		businessHours: {
-			start: '9:00',
-			end: '17:00',
-			dow: [ 1, 2, 3, 4, 5 ]
 		}
 	});
 
@@ -61,4 +74,8 @@ module.controller('roomsCtrl', ['rooms', '$scope', function(rooms, $scope) {
 	});
 	// Let's trigger this once.
 	$(window).trigger('resize');
+
+	setInterval(function() {
+		$('#calendar').fullCalendar( 'refetchEvents' );
+	}, REFRESH_RATE);
 }]);

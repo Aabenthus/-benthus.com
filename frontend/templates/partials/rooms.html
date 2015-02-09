@@ -1,3 +1,30 @@
-<div class="container map">
+<div class="rooms">
 	<div id="calendar" ng-class="{loading: loading}"></div>
+	<div id="information-btn-container">
+		<span
+			class="glyphicon glyphicon-info-sign"
+			aria-hidden="true"
+			ng-click="information_visible=true"></span>
+	</div>
+	<div
+		id="information-container"
+		ng-show="information_visible"
+		ng-click="information_visible=false">
+		<div class="cell">
+			<div
+				id="information"
+				ng-show="information_visible"
+				ng-click="$event.stopPropagation();">
+				<h1>Room booking at Åbenthus</h1>
+				<p>To book a room, simply create an event in your own calendar and invite <strong>{{ rooms_information.email }}</strong> to the event. In the where field, please include one of the following along with other information about the location (ex the address):</p>
+				<ul>
+					<li ng-repeat="room in rooms_information.rooms">
+						<span class="glyphicon {{ 'glyphicon-' + room.glyphicon }}" aria-hidden="true"></span>
+						<strong>{{ room.title }}</strong>: {{ room.physical_location }}
+					</li>
+				</ul>
+				<img src="/images/google-where-field.png">
+			</div>
+		</div>
+	</div>
 </div>

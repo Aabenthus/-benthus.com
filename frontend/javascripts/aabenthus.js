@@ -18,6 +18,11 @@ module.config(['$stateProvider', '$urlRouterProvider',
 			url: '/rooms',
 			controller: 'roomsCtrl',
 			controllerAs: 'rooms',
-			templateUrl: '/templates/partials/rooms.html'
+			templateUrl: '/templates/partials/rooms.html',
+			resolve: {
+				'rooms_information': ['rooms', function(rooms) {
+					return rooms.get_rooms();
+				}]
+			}
 		});
 }]);

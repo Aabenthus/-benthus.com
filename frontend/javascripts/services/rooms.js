@@ -1,13 +1,14 @@
 var module = angular.module('aabenthus');
 
 module.factory('rooms', ['$http', '$q', function($http, $q) {
+
 	var BASE_URL = 'http://local.api.åbenthus.com';
 
-	this.get = function() {
+	this.get_rooms = function() {
 		var deferred = $q.defer();
-		var url = [BASE_URL, 'rooms', 'bookings'];
+		var url = [BASE_URL, 'rooms'];
 
-		$http.get(url.join('/')).then(function(response) {
+		$http.get(url.join('/') + '/').then(function(response) {
 			deferred.resolve(response.data);
 		}, deferred.reject);
 
@@ -26,7 +27,7 @@ module.factory('rooms', ['$http', '$q', function($http, $q) {
 		}
 		console.log(url);
 
-		$http.get(url.join('/')).then(function(response) {
+		$http.get(url.join('/') + '/').then(function(response) {
 			deferred.resolve(response.data);
 		}, deferred.reject);
 
