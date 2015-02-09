@@ -6,6 +6,11 @@ urlpatterns = patterns('',
     # url(r'^blog/', include('blog.urls')),
 
     url(
+    	r'^/?$',
+    	'aabenthus_com.rooms.views.list_rooms',
+    	name='list_rooms'
+    ),
+    url(
     	r'^bookings/?$',
     	'aabenthus_com.rooms.views.list_bookings',
     	name='list_bookings'
@@ -16,13 +21,13 @@ urlpatterns = patterns('',
     	name='list_bookings_limited'
     ),
     url(
-    	r'^bookings/notify-about-conflicts?$',
+    	r'^bookings/notify-about-conflicts/?$',
     	'aabenthus_com.rooms.views.notify_about_conflicts',
     	name='notify_about_conflicts'
     ),
     url(
-    	r'^(?P<room_slug>[a-z]+)/bookings/ical?$',
+    	r'^(?P<room_slug>[a-z]+)/bookings/ical/?$',
     	'aabenthus_com.rooms.views.booking_ical_feed',
     	name='booking_ical_feed'
-    ),
+    )
 )
