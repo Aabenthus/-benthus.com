@@ -106,8 +106,8 @@ GOOGLE_SCOPE = (
 	'https://www.googleapis.com/auth/userinfo.profile'
 )
 
-#ROOMS_EMAIL = 'rooms@socialsquare.dk'
-ROOMS_EMAIL = 'kraen@socialsquare.dk'
+ROOMS_EMAIL = 'rooms@åbenthus.com'
+#ROOMS_EMAIL = 'kraen@socialsquare.dk'
 
 CONFLICT_MAIL_SUBJECT = 'Room booking rejected: %s'
 CONFLICT_MAIL_FROM = ROOMS_EMAIL

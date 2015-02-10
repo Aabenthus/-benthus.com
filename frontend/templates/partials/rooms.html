@@ -15,8 +15,8 @@
 				id="information"
 				ng-show="information_visible"
 				ng-click="$event.stopPropagation();">
-				<h1>Room booking at Åbenthus</h1>
-				<p>To book a room, simply create an event in your own calendar and invite <strong>{{ rooms_information.email }}</strong> to the event. In the where field, please include one of the following along with other information about the location (ex the address):</p>
+				<h1>Room booking at Åbent Hus</h1>
+				<p>To book a room, simply create an event in your own calendar and invite <strong>{{ rooms_information.email }}</strong> to the event. In the "where"-field, please include one of the following along with other information about the location (ex the address):</p>
 				<ul>
 					<li ng-repeat="room in rooms_information.rooms">
 						<span class="glyphicon {{ 'glyphicon-' + room.glyphicon }}" aria-hidden="true"></span>
