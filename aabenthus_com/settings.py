@@ -89,10 +89,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
-	'local.åbenthus.com',
-	'åbenthus.com',
-	'local.xn--benthus-dxa.com',
-	'xn--benthus-dxa.com'
+	'local.api.åbenthus.com',
+	'api.åbenthus.com',
+	'local.api.xn--benthus-dxa.com',
+	'api.xn--benthus-dxa.com'
 )
 
 GOOGLE_CLIENT_ID = '1067303134515-23n0icstkai0gi5uf5t7ocld1phgor4a.apps.googleusercontent.com'
