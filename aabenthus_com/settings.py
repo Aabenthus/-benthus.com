@@ -25,7 +25,12 @@ DEBUG = True
 
 TEMPLATE_DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+	'local.api.åbenthus.com',
+	'api.åbenthus.com',
+	'local.api.xn--benthus-dxa.com',
+	'api.xn--benthus-dxa.com'
+]
 
 
 # Application definition
@@ -89,10 +94,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
-	'local.api.åbenthus.com',
-	'api.åbenthus.com',
-	'local.api.xn--benthus-dxa.com',
-	'api.xn--benthus-dxa.com'
+	'local.åbenthus.com',
+	'åbenthus.com',
+	'local.xn--benthus-dxa.com',
+	'xn--benthus-dxa.com'
 )
 
 GOOGLE_CLIENT_ID = '1067303134515-23n0icstkai0gi5uf5t7ocld1phgor4a.apps.googleusercontent.com'
