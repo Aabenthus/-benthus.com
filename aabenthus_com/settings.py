@@ -26,8 +26,6 @@ DEBUG = True
 TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = [
-	'local.api.åbenthus.com',
-	'api.åbenthus.com',
 	'local.api.xn--benthus-dxa.com',
 	'api.xn--benthus-dxa.com'
 ]
@@ -94,8 +92,6 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
-	'local.åbenthus.com',
-	'åbenthus.com',
 	'local.xn--benthus-dxa.com',
 	'xn--benthus-dxa.com'
 )
