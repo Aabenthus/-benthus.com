@@ -94,6 +94,8 @@ STATIC_URL = '/static/'
 CORS_ORIGIN_WHITELIST = (
 	'local.xn--benthus-dxa.com',
 	'xn--benthus-dxa.com'
+	'local.www.xn--benthus-dxa.com',
+	'www.xn--benthus-dxa.com'
 )
 
 GOOGLE_CLIENT_ID = '1067303134515-23n0icstkai0gi5uf5t7ocld1phgor4a.apps.googleusercontent.com'
