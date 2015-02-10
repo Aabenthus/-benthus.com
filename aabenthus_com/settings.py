@@ -107,7 +107,6 @@ GOOGLE_SCOPE = (
 )
 
 ROOMS_EMAIL = 'rooms@xn--benthus-dxa.com'
-#ROOMS_EMAIL = 'kraen@socialsquare.dk'
 
 CONFLICT_MAIL_SUBJECT = 'Room booking rejected: %s'
 CONFLICT_MAIL_FROM = ROOMS_EMAIL

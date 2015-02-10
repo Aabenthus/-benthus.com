@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   version="1.1"
+   x="0px"
+   y="0px"
+   width="67.638885"
+   height="73.03241"
+   viewBox="5 -10 67.638885 98.593753"
+   enable-background="new 0 0 100 100"
+   xml:space="preserve"
+   id="svg2"
+   inkscape:version="0.48.3.1 r9886"
+   sodipodi:docname="noun_10121_cc.svg"><metadata
+   id="metadata32"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /></cc:Work></rdf:RDF></metadata><defs
+   id="defs30" /><sodipodi:namedview
+   pagecolor="#ffffff"
+   bordercolor="#666666"
+   borderopacity="1"
+   objecttolerance="10"
+   gridtolerance="10"
+   guidetolerance="10"
+   inkscape:pageopacity="0"
+   inkscape:pageshadow="2"
+   inkscape:window-width="1200"
+   inkscape:window-height="1870"
+   id="namedview28"
+   showgrid="false"
+   fit-margin-top="0"
+   fit-margin-left="0"
+   fit-margin-right="0"
+   fit-margin-bottom="0"
+   inkscape:zoom="3.337544"
+   inkscape:cx="-31.975179"
+   inkscape:cy="38.58216"
+   inkscape:window-x="0"
+   inkscape:window-y="0"
+   inkscape:window-maximized="1"
+   inkscape:current-layer="Your_Icon" />
+<g
+   id="Captions"
+   transform="translate(-16.84375,-10.90625)">
+</g>
+<g
+   id="Your_Icon"
+   transform="translate(-10.955866,-10.90625)">
+	
+		<rect
+   x="14.316"
+   y="57.185001"
+   stroke-miterlimit="10"
+   width="71.369003"
+   height="40.807999"
+   id="rect6"
+   style="fill:none;stroke:#ffffff;stroke-width:3;stroke-miterlimit:10" />
+	
+	
+	<polygon
+   stroke-miterlimit="10"
+   points="50,3 8.043,43.808 91.956,43.808 "
+   id="polygon18"
+   style="fill:none;stroke:#ffffff;stroke-width:3;stroke-miterlimit:10" />
+	
+	<polyline
+   stroke-miterlimit="10"
+   points="74.227,26.563 74.227,3.77 61.292,3.77    61.292,13.983  "
+   id="polyline22"
+   style="fill:none;stroke:#ffffff;stroke-width:3;stroke-miterlimit:10" />
+</g>
+</svg>

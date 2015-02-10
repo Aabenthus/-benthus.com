@@ -6,6 +6,13 @@
 	height: 100%;
 }
 
+a {
+	color: white;
+	&:hover {
+		color: @gray-light;
+	}
+}
+
 .logos-container {
 	display: table;
 	.logos {
@@ -16,6 +23,11 @@
 			margin: 2em;
 		}
 	}
+	#main-logo {
+		margin-bottom: 3em;
+		width: 250px;
+		max-width: 50%;
+	}
 }
 
 .controls-container {
@@ -24,7 +36,10 @@
 	right: 0.3em;
 	font-size: 3em;
 	text-shadow: 0px 0px 5px #000;
-	a {
-		color: white;
-	}
+}
+
+.credit-container {
+	position: absolute;
+	bottom: 0.3em;
+	left: 0.3em;
 }
