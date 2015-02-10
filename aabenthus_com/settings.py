@@ -93,7 +93,7 @@ STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
 	'local.xn--benthus-dxa.com',
-	'xn--benthus-dxa.com'
+	'xn--benthus-dxa.com',
 	'local.www.xn--benthus-dxa.com',
 	'www.xn--benthus-dxa.com'
 )
