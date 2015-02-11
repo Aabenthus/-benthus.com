@@ -7516,8 +7516,8 @@ body {
 }
 .fc-event .glyphicon {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 3px;
+  right: 3px;
 }
 .fc-event.conflicts {
   opacity: 0.66;

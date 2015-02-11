@@ -37,10 +37,12 @@ module.controller('roomsCtrl', ['rooms', '$scope', 'rooms_information',
 						if(event.conflicts) {
 							eventClassNames.push('conflicts');
 						}
+						var event_start = event.start.date ? event.start.date : event.start.dateTime;
+						var event_end = event.end.date ? event.end.date : event.end.dateTime;
 						var event_data = {
 							title: event.summary,
-							start: event.start.dateTime,
-							end: event.end.dateTime,
+							start: event_start,
+							end: event_end,
 							color: room.color,
 							textColor: 'white',
 							//className: room_class

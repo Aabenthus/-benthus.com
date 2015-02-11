@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.template.loader import render_to_string
 from django.core.urlresolvers import reverse
 
-from datetime import timedelta
+from datetime import timedelta, datetime, time
 import dateutil.parser
 import pytz
 
@@ -117,15 +117,17 @@ def has_declined_event(event):
 					return True
 	return False
 
-def get_future_events():
+def get_future_events(timeMin = None, timeMax = None):
 	credentials = get_credentials()
 	service = services.calendar(credentials)
 
-	timeMin = timezone.now()
-	timeMin = timeMin.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+	if not timeMin:
+		timeMin = timezone.now()
+		timeMin = timeMin.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
 
-	one_month = timedelta(days=30) # We look one month forward
-	timeMax = timeMin + one_month
+	if not timeMax:
+		one_month = timedelta(days=30)
+		timeMax = timeMin + one_month
 
 	all_future_events_request = service.events().list(
 		calendarId = 'primary',
@@ -135,8 +137,31 @@ def get_future_events():
 		orderBy='startTime'
 	)
 	all_future_events = all_future_events_request.execute()
+	timeZone = pytz.timezone(all_future_events.get('timeZone'))
 
-	return ( all_future_events.get('items'), all_future_events.get('timeZone') )
+	morning = time(0, 0, 0, tzinfo = timeZone)
+	evening = time(0, 0, 0, tzinfo = timeZone)
+
+	events = all_future_events.get('items')
+	for event in events:
+		start_dateTime = event.get('start').get('dateTime')
+		start_date = event.get('start').get('date')
+		end_dateTime = event.get('end').get('dateTime')
+		end_date = event.get('end').get('date')
+
+		if start_date:
+			start_date = dateutil.parser.parse(start_date)
+		if end_date:
+			end_date = dateutil.parser.parse(end_date)
+
+		if not start_dateTime and start_date:
+			start_dateTime = datetime.combine(start_date, morning)
+			event.get('start')['dateTime'] = start_dateTime.isoformat()
+		if not end_dateTime and end_date:
+			end_dateTime = datetime.combine(end_date, evening)
+			event.get('end')['dateTime'] = end_dateTime.isoformat()
+
+	return ( events, timeZone )
 
 # Accessable views
 
@@ -153,30 +178,10 @@ def list_rooms(request):
 	}), content_type="application/json" )
 
 def list_bookings(request, timeMin = None, timeMax = None):
-	credentials = get_credentials()
-	service = services.calendar(credentials)
-
-	if timeMin:
-		timeMin = dateutil.parser.parse(timeMin)
-	else:
-		timeMin = timezone.now()
-		timeMin = timeMin.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
-
-	if timeMax:
-		timeMax = dateutil.parser.parse(timeMax)
-	else:
-		one_week = timedelta(days=7)
-		timeMax = timeMin + one_week
-
-	all_future_events_request = service.events().list(
-		calendarId = 'primary',
-		singleEvents=True,
-		timeMin=timeMin.isoformat(),
-		timeMax=timeMax.isoformat(),
-		orderBy='startTime'
-	)
-	all_future_events = all_future_events_request.execute()
-	future_events = split_events_on_rooms(all_future_events.get('items'))
+	timeMin = dateutil.parser.parse(timeMin)
+	timeMax = dateutil.parser.parse(timeMax)
+	all_future_events, timeZone = get_future_events(timeMin, timeMax)
+	future_events = split_events_on_rooms(all_future_events)
 	future_events = calculate_conflicts(future_events)
 	future_events = add_organizers_images(future_events)
 
@@ -223,7 +228,6 @@ def booking_ical_feed(request, room_slug):
 		cal['summary'] = u'☑ %s room' % room.title
 
 		all_future_events, timeZone = get_future_events()
-		timeZone = pytz.timezone(timeZone)
 		future_events = split_events_on_rooms(all_future_events)
 		future_events = calculate_conflicts(future_events)
 
