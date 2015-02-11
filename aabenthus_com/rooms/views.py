@@ -245,12 +245,14 @@ def booking_ical_feed(request, room_slug):
 
 		# Create a calendar
 		cal = Calendar()
-		cal['summary'] = u'☑ %s room' % room.title
+		#cal['summary'] = u'☑ %s room' % room.title
+		#cal['X-WR-CALNAME'] = u'☑ %s room' % room.title
+		cal['summary'] = u'Room: %s' % room.title
+		cal['X-WR-CALNAME'] = u'Room: %s' % room.title
 		cal['prodid'] = '-//Socialsquare ApS//Aabenthus_com Rooms Booking//EN'
 		cal['version'] = '2.0'
 		cal['CALSCALE'] = 'GREGORIAN'
 		cal['METHOD'] = 'PUBLISH'
-		cal['X-WR-CALNAME'] = u'☑ %s room' % room.title
 		cal['X-WR-TIMEZONE'] = timeZone
 
 		for some_room in future_events:
