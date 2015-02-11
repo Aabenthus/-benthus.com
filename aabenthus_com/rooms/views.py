@@ -259,7 +259,7 @@ def booking_ical_feed(request, room_slug):
 					if not event.get('conflicts'):
 						ical_event = Event()
 
-						ical_event.add('id', "aabenthus.%s" % event.get('iCalUID'))
+						ical_event.add('uid', "aabenthus.%s" % event.get('iCalUID'))
 
 						start = get_event_date_or_datetime( event.get('start'), timeZone )
 						end = get_event_date_or_datetime( event.get('end'), timeZone )
