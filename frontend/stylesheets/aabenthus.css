@@ -7522,6 +7522,24 @@ body {
 .fc-event.conflicts {
   opacity: 0.66;
 }
+.fc-event .fc-content {
+  padding-left: 30px;
+}
+.fc-event .organizer {
+  display: table;
+  position: absolute;
+  width: 30px;
+  height: 100%;
+  left: 0;
+  top: 0;
+  border-width: 1px;
+  text-align: center;
+}
+.fc-event .organizer span {
+  display: table-cell;
+  vertical-align: middle;
+  font-weight: bold;
+}
 body #information-btn-container {
   display: none;
 }
@@ -7576,6 +7594,9 @@ body #location-container p {
   margin: auto;
   background-color: rgba(0, 0, 0, 0.66);
   color: #eeeeee;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 100%;
 }
 #information-container #information h1 {
   text-align: center;
@@ -7590,6 +7611,9 @@ body #location-container p {
 #information-container #information img {
   display: block;
   margin: 1em auto;
+}
+#information-container #information .room-ical-url {
+  margin-top: 0.2em;
 }
 .background,
 .logos-container {

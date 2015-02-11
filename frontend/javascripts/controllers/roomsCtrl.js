@@ -47,7 +47,8 @@ module.controller('roomsCtrl', ['rooms', '$scope', 'rooms_information',
 							textColor: 'white',
 							//className: room_class
 							className: eventClassNames.join(' '),
-							glyphicon: room.glyphicon
+							glyphicon: room.glyphicon,
+							organizer_initials: event.organizer.initials
 						};
 						events.push(event_data);
 					}
@@ -58,10 +59,16 @@ module.controller('roomsCtrl', ['rooms', '$scope', 'rooms_information',
 		eventRender: function(event, element) {
 			if(event.glyphicon) {
 				$(element).append('<span class="glyphicon glyphicon-'+event.glyphicon+'">');
-				if(event.organizer_image) {
-					$organizer = $('<span class="organizer"></span>');
-					$organizer.css('background-image', 'url(' +event.organizer_photo+ ')');
-					$(element).append($organizer);
+				if(event.organizer_initials) {
+					$organizer_container = $('<div class="organizer"></div>');
+					$organizer_container.css({
+						'background-color': $(element).css('background-color')
+					});
+					$organizer = $('<span></span>');
+					$organizer.text(event.organizer_initials);
+					$organizer_container.append($organizer);
+					//$organizer.css('background-image', 'url(' +event.organizer_photo+ ')');
+					$(element).append($organizer_container);
 				}
 			}
 		},
@@ -76,6 +83,11 @@ module.controller('roomsCtrl', ['rooms', '$scope', 'rooms_information',
 	});
 	// Let's trigger this once.
 	$(window).trigger('resize');
+	$('#calendar').on('click', '.fc-widget-content', function() {
+		$scope.$apply(function() {
+			$scope.information_visible = true;
+		});
+	});
 
 	setInterval(function() {
 		$('#calendar').fullCalendar( 'refetchEvents' );

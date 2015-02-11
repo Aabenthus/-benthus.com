@@ -25,13 +25,22 @@
 				ng-click="$event.stopPropagation();">
 				<h1>Room booking at Åbent Hus</h1>
 				<p>To book a room, simply create an event in your own calendar and invite <strong>rooms@åbenthus.com</strong> to the event. In the "where"-field, please include one of the following along with other information about the location (ex the address):</p>
-				<ul>
-					<li ng-repeat="room in rooms_information.rooms">
-						<span class="glyphicon {{ 'glyphicon-' + room.glyphicon }}" aria-hidden="true"></span>
-						<strong>{{ room.title }}</strong>: {{ room.physical_location }}
+				<img src="/images/google-where-field.png">
+				<ul class="row">
+					<li ng-repeat="room in rooms_information.rooms" class="col-md-4">
+						<h3><span class="glyphicon {{ 'glyphicon-' + room.glyphicon }}" aria-hidden="true"></span> {{ room.title }}</h3>
+						<p>{{ room.physical_location }}</p>
 					</li>
 				</ul>
-				<img src="/images/google-where-field.png">
+				<h4>iCal feeds</h4>
+				<p>Select the URL, copy it to your clipboard and import as URL into Google</p>
+				<div class="input-group input-group-sm room-ical-url" ng-repeat="room in rooms_information.rooms">
+					<span class="input-group-addon" id="sizing-addon3">
+						iCal
+						<span class="glyphicon glyphicon-link" aria-hidden="true"></span>
+					</span>
+					<input type="text" class="form-control" placeholder="iCal URL" ng-model="room.url" disabled>
+				</div>
 			</div>
 		</div>
 	</div>

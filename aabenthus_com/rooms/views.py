@@ -12,11 +12,10 @@ from datetime import timedelta, datetime, time
 import dateutil.parser
 import pytz
 
-import json
+import json, re, md5
 from oauth2client import client
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.django_orm import Storage
-import re
 
 from aabenthus_com.google import services
 from aabenthus_com.google.models import Authorization
@@ -72,7 +71,11 @@ def calculate_conflicts(rooms):
 	return rooms
 
 def add_organizers_images(rooms_and_events):
-	#organizer_image
+	for room_and_events in rooms_and_events:
+		for event in room_and_events.get('events'):
+			if event.get('organizer') and event.get('organizer').get('displayName'):
+				displayName = event.get('organizer').get('displayName')
+				event['organizer']['initials'] = ''.join([l for l in displayName if l.isupper()])
 	return rooms_and_events
 
 def send_conflict_mail(event, room):

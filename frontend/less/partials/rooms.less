@@ -16,6 +16,26 @@ body {
 	opacity: 0.66;
 }
 
+.fc-event .fc-content {
+	padding-left: 30px;
+}
+
+.fc-event .organizer {
+	display: table;
+	position: absolute;
+	width: 30px;
+	height: 100%;
+	left: 0;
+	top: 0;
+	border-width: 1px;
+	text-align: center;
+	span {
+		display: table-cell;
+		vertical-align: middle;
+		font-weight: bold;
+	}
+}
+
 body #information-btn-container {
 	display: none;
 }
@@ -73,6 +93,10 @@ body #location-container {
 		margin: auto;
 		background-color: rgba(0, 0, 0, 0.66);
 		color: @gray-lighter;
+		
+		overflow-x: hidden;
+		overflow-y: auto;
+		max-height: 100%;
 
 		h1 {
 			text-align: center;
@@ -89,6 +113,10 @@ body #location-container {
 		img {
 			display: block;
 			margin: 1em auto;
+		}
+
+		.room-ical-url {
+			margin-top: 0.2em;
 		}
 	}
 }
