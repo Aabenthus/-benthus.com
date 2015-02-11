@@ -1,3 +1,4 @@
+/db.sqlite3.backup
 *.sqlite3
 *.pyc
 aabenthus_com/local_settings.py

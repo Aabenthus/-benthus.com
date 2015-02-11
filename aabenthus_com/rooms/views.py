@@ -112,7 +112,7 @@ def change_response_status(event, status):
 def has_declined_event(event):
 	if event.get('attendees'):
 		for attendee in event.get('attendees'):
-			if attendee['self']:
+			if attendee.get('self'):
 				if attendee['responseStatus'] == 'declined':
 					return True
 	return False
