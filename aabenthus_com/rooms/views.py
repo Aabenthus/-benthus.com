@@ -147,6 +147,8 @@ def get_future_events(timeMin = None, timeMax = None):
 	evening = time(0, 0, 0, tzinfo = timeZone)
 
 	events = all_future_events.get('items')
+
+	# Give start and end dates a dateTime representation as well.
 	for event in events:
 		start_dateTime = event.get('start').get('dateTime')
 		start_date = event.get('start').get('date')
@@ -223,6 +225,15 @@ def notify_about_conflicts(request):
 		'accepted_events': accepted_events
 	} ), content_type="application/json" )
 
+def get_event_date_or_datetime(field, timeZone):
+	if field.get('date'):
+		value = field.get('date')
+	elif field.get('dateTime'):
+		value = field.get('dateTime')
+	else:
+		return None
+	return dateutil.parser.parse( value ).replace(tzinfo=timeZone)
+
 def booking_ical_feed(request, room_slug):
 	rooms = [r for r in Room.objects.all() if r.slug() == room_slug]
 	if len(rooms) == 1:
@@ -243,10 +254,8 @@ def booking_ical_feed(request, room_slug):
 
 						ical_event.add('id', event.get('iCalUID'))
 
-						start = dateutil.parser.parse( event.get('start').get('dateTime') )
-						end = dateutil.parser.parse( event.get('end').get('dateTime') )
-						start = start.replace(tzinfo=timeZone)
-						end = end.replace(tzinfo=timeZone)
+						start = get_event_date_or_datetime( event.get('start'), timeZone )
+						end = get_event_date_or_datetime( event.get('end'), timeZone )
 						ical_event.add('dtstart', start)
 						ical_event.add('dtend', end)
 							
