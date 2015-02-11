@@ -178,8 +178,8 @@ def list_rooms(request):
 	}), content_type="application/json" )
 
 def list_bookings(request, timeMin = None, timeMax = None):
-	timeMin = dateutil.parser.parse(timeMin)
-	timeMax = dateutil.parser.parse(timeMax)
+	timeMin = dateutil.parser.parse(timeMin) if timeMin else None
+	timeMax = dateutil.parser.parse(timeMax) if timeMax else None
 	all_future_events, timeZone = get_future_events(timeMin, timeMax)
 	future_events = split_events_on_rooms(all_future_events)
 	future_events = calculate_conflicts(future_events)
