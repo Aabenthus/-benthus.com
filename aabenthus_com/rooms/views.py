@@ -95,7 +95,7 @@ def change_response_status(event, status):
 
 	if event.get('attendees'):
 		for attendee in event.get('attendees'):
-			if attendee['self']:
+			if attendee.get('self'):
 				attendee['responseStatus'] = status
 	else: # Althrough this is very unlikely ..
 		event['attendees'] = [{
