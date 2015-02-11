@@ -54,8 +54,12 @@ def calculate_conflicts(rooms):
 		for event1 in room.get('events'):
 			for event2 in room.get('events'):
 				different = event1 is not event2
-				event1_ends_efter_event2_starts = event1.get('end') > event2.get('start')
-				event1_starts_before_event2_ends = event1.get('starts') < event2.get('end')
+				event1_start_dateTime = dateutil.parser.parse(event1.get('starts'))
+				event1_end_dateTime = dateutil.parser.parse(event1.get('end'))
+				event2_start_dateTime = dateutil.parser.parse(event2.get('starts'))
+				event2_end_dateTime = dateutil.parser.parse(event2.get('end'))
+				event1_ends_efter_event2_starts = event1_end_dateTime > event2_start_dateTime
+				event1_starts_before_event2_ends = event1_start_dateTime < event2_end_dateTime
 				if different and event1_ends_efter_event2_starts and event1_starts_before_event2_ends:
 					event1_created = dateutil.parser.parse( event1.get('updated') )
 					event2_created = dateutil.parser.parse( event2.get('updated') )
