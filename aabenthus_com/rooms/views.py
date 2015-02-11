@@ -260,7 +260,8 @@ def booking_ical_feed(request, room_slug):
 						ical_event.add('dtend', end)
 							
 						ical_organizer = vCalAddress( 'MAILTO:%s' % event.get('organizer').get('email') )
-						ical_organizer.params['cn'] = event.get('organizer').get('displayName')
+						if event.get('organizer').get('displayName'):
+							ical_organizer.params['cn'] = event.get('organizer').get('displayName')
 						ical_event.add('organizer', ical_organizer)
 
 						if event.get('visibility') == 'private':
@@ -271,7 +272,8 @@ def booking_ical_feed(request, room_slug):
 							if event.get('attendees'):
 								for attendee in event.get('attendees'):
 									ical_attendee = vCalAddress('MAILTO:%s' % attendee.get('email'))
-									ical_attendee.params['cn'] = attendee.get('displayName')
+									if attendee.get('displayName'):
+										ical_attendee.params['cn'] = attendee.get('displayName')
 									ical_event.add('attendee', ical_attendee)
 
 						cal.add_component(ical_event)
