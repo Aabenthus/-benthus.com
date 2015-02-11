@@ -141,7 +141,7 @@ def get_future_events(timeMin = None, timeMax = None):
 		orderBy='startTime'
 	)
 	all_future_events = all_future_events_request.execute()
-	timeZone = pytz.timezone(all_future_events.get('timeZone'))
+	timeZone = pytz.timezone( all_future_events.get('timeZone') )
 
 	morning = time(0, 0, 0, tzinfo = timeZone)
 	evening = time(0, 0, 0, tzinfo = timeZone)
