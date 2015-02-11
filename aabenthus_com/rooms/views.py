@@ -238,13 +238,20 @@ def booking_ical_feed(request, room_slug):
 	rooms = [r for r in Room.objects.all() if r.slug() == room_slug]
 	if len(rooms) == 1:
 		room = rooms[0]
-		# Create a calendar
-		cal = Calendar()
-		cal['summary'] = u'☑ %s room' % room.title
 
 		all_future_events, timeZone = get_future_events()
 		future_events = split_events_on_rooms(all_future_events)
 		future_events = calculate_conflicts(future_events)
+
+		# Create a calendar
+		cal = Calendar()
+		cal['summary'] = u'☑ %s room' % room.title
+		cal['prodid'] = '-//Socialsquare ApS//Aabenthus_com Rooms Booking//EN'
+		cal['version'] = '2.0'
+		cal['CALSCALE'] = 'GREGORIAN'
+		cal['METHOD'] = 'PUBLISH'
+		cal['X-WR-CALNAME'] = u'☑ %s room' % room.title
+		cal['X-WR-TIMEZONE'] = timeZone
 
 		for some_room in future_events:
 			if some_room.get('title') == room.title:
@@ -252,7 +259,7 @@ def booking_ical_feed(request, room_slug):
 					if not event.get('conflicts'):
 						ical_event = Event()
 
-						ical_event.add('id', event.get('iCalUID'))
+						ical_event.add('id', "aabenthus.%s" % event.get('iCalUID'))
 
 						start = get_event_date_or_datetime( event.get('start'), timeZone )
 						end = get_event_date_or_datetime( event.get('end'), timeZone )
