@@ -92,6 +92,8 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 CORS_ORIGIN_WHITELIST = (
+	'rooms.airtame.com',
+	'rooms.socialsquare.dk',
 	'local.xn--benthus-dxa.com',
 	'xn--benthus-dxa.com',
 	'local.www.xn--benthus-dxa.com',
