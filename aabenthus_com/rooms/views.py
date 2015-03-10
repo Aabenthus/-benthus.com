@@ -102,29 +102,46 @@ def change_response_status(event, status):
 
 	if event.get('attendees'):
 		for attendee in event.get('attendees'):
-			if attendee.get('self'):
+			if attendee.get('email') in settings.ROOM_CALENDARS:
 				attendee['responseStatus'] = status
 	else: # Althrough this is very unlikely ..
-		event['attendees'] = [{
-			'email': settings.ROOMS_EMAIL,
-			'responseStatus': status
-		}]
+		raise BaseException('The event has no attendees - how did the invitation arrive?')
 
-	service.events().update(
-		calendarId='primary',
-		eventId=event['id'],
+	response = service.events().update(
+		calendarId=event.get('calendarId'),
+		eventId=event.get('id'),
 		body=event
 	).execute()
 
 def has_declined_event(event):
 	if event.get('attendees'):
 		for attendee in event.get('attendees'):
-			if attendee.get('self'):
+			# Assuming that the emails of the participant and the Calendar ID matches.
+			if attendee.get('email') in settings.ROOM_CALENDARS:
 				if attendee['responseStatus'] == 'declined':
 					return True
 	return False
 
 def get_future_events(timeMin = None, timeMax = None):
+	result = []
+	timeZone = None
+	credentials = get_credentials()
+	service = services.calendar(credentials)
+	calendars = service.calendarList().list().execute()
+	for calendar in calendars.get('items'):
+		calendarId = calendar.get('id')
+		if calendarId in settings.ROOM_CALENDARS:
+			future_events_in_calendar, calendarTimeZone = \
+				get_future_events_in_calendar(calendarId, timeMin, timeMax)
+			# Save or check the time zone.
+			if timeZone == None:
+				timeZone = calendarTimeZone
+			elif timeZone and calendarTimeZone != timeZone:
+				raise BaseException('All the room calendars must have the same timezone.')
+			result = result + future_events_in_calendar
+	return (result, timeZone)
+
+def get_future_events_in_calendar(calendarId, timeMin = None, timeMax = None):
 	credentials = get_credentials()
 	service = services.calendar(credentials)
 
@@ -137,7 +154,7 @@ def get_future_events(timeMin = None, timeMax = None):
 		timeMax = timeMin + one_month
 
 	all_future_events_request = service.events().list(
-		calendarId = 'primary',
+		calendarId = calendarId,
 		singleEvents=True,
 		timeMin=timeMin.isoformat(),
 		timeMax=timeMax.isoformat(),
@@ -169,6 +186,9 @@ def get_future_events(timeMin = None, timeMax = None):
 		if not end_dateTime and end_date:
 			end_dateTime = datetime.combine(end_date, evening)
 			event.get('end')['dateTime'] = end_dateTime.isoformat()
+		# Add the calendars id to the event, such that the frontend can display
+		# a difference.
+		event['calendarId'] = calendarId
 
 	return ( events, timeZone )
 
@@ -211,6 +231,7 @@ def notify_about_conflicts(request):
 		for event in room.get('events'):
 			declines_event = has_declined_event(event)
 			if not event.get('conflicts') and declines_event:
+				print('Accepting event: %s' % event.get('id'))
 				change_response_status(event, 'accepted')
 				accepted_events.append(event)
 
@@ -219,6 +240,7 @@ def notify_about_conflicts(request):
 		for event in room.get('events'):
 			declines_event = has_declined_event(event)
 			if event.get('conflicts') and not declines_event:
+				print('Declining event: %s' % event.get('id'))
 				send_conflict_mail(event, room)
 				change_response_status(event, 'declined')
 				declined_events.append(event)

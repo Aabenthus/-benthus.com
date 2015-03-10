@@ -112,3 +112,9 @@ CONFLICT_MAIL_SUBJECT = 'Room booking rejected: %s'
 CONFLICT_MAIL_FROM = ROOMS_EMAIL
 
 FRONTEND_BASE_URL = 'http://åbenthus.com'
+
+ROOM_CALENDARS = (
+	'rooms@xn--benthus-dxa.com',
+	'rooms@socialsquare.dk',
+	'rooms@airtame.com',
+)
